@@ -1,0 +1,16 @@
+Public Sub getMailName()
+    Dim myItem As Outlook.MailItem
+    Dim AttachmentFile As Attachment
+    Dim OL As New Outlook.Application
+    Dim myattachments As Outlook.Attachments
+    Set myItem = OL.CreateItemFromTemplate("C:\Users\Jessie\Desktop\James Chen\获取附件.msg")
+    'myItem.Display
+    Set myattachments = myItem.Attachments
+    Debug.Print myattachments.Count
+    For i = 1 To myattachments.Count
+        Set AttachmentFile = myattachments(1)
+        AttachmentFile.SaveAsFile "C:\Users\Jessie\Desktop\James Chen\获取附件.xlsx"
+    Next
+    myItem.Close (1)
+    OL.Quit
+End Sub
