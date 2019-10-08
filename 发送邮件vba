@@ -1,0 +1,204 @@
+
+'Send Message - Security problems with 2007 moved to CDO
+'Sub SendMailMessage(MailTo As String)
+'Sub sendMailMsg()
+'
+'    'Objects
+'    Dim myOApp          As Outlook.application
+''    Dim myOApp          As Object
+'    Dim myItem          As MailItem
+''    Dim myItem          As Object
+'    Dim w               As Worksheet
+'    Dim c               As Range
+'    '
+'    Dim eSubject        As String
+'    Dim eBody           As String
+'    Dim fName           As String
+'    Dim MailTo          As String
+'
+'
+'    Set w = Worksheets("Listings")
+'    With w
+'        MailTo = .Range("mailList").Value
+'        eSubject = .Range("mailSubject").Value
+'        For Each c In .Range("mailBody").Cells
+'            eBody = eBody & c.Value & vbCrLf
+'        Next
+'    End With
+'    Set w = Nothing
+'
+'    Set myOApp = CreateObject("Outlook.Application")
+'    Set myItem = myOApp.CreateItem(olMailItem)
+'
+'    With myItem
+'        .To = MailTo
+'        .Subject = eSubject
+'        .Body = eBody
+''        .Attachments.Add fName, olByValue, 1
+'        .Send
+'    End With
+'
+'    Set myItem = Nothing
+'    Set myOApp = Nothing
+'
+' End Sub
+
+Sub CDO_Mail()
+
+    Dim iMsg            As Object
+    Dim iConf           As Object
+    'Variables
+    Dim Flds            As Variant
+    Dim aPath           As String
+    Dim hPath           As String
+    Dim hFile           As String
+    
+    'On Error Resume Next
+    
+    aPath = ActiveWorkbook.path
+    hPath = Replace(aPath, "\", "/")
+    hFile = "file://" & hPath & "/" & "SamsBody.htm"
+    
+'    Call CreateHTML
+    Call PublishHTML
+    
+    Set iMsg = CreateObject("CDO.Message")
+    Set iConf = CreateObject("CDO.Configuration")
+
+    iConf.Load -1
+    Set Flds = iConf.Fields
+    With Flds
+        .item("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
+        .item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 25
+        .item("http://schemas.microsoft.com/cdo/configuration/smtpserver") _
+            = "stmp.qq.com" 'Range("mailServer").Value
+        .Update
+    End With
+        
+    With iMsg
+        Set .Configuration = iConf
+        '.To = Range("mailList").Value
+        .to = "827765357@qq.com"
+        '.Cc = Range("ccList").Value
+        .from = "827765357@qq.com"
+        '.From = Range("mailSender").Value
+        .Subject = Range("MailSubject").Value
+        If Range("CheckTotal").Value < Range("MailValue").Value Then
+           .TextBody = "System Data not transferred, Flash Report will be published later."
+        Else
+            '.CreateMHTMLBody hFile
+'            .AddAttachment ""
+        End If
+        '.display
+        .Send
+        
+    End With
+
+    Set iMsg = Nothing
+    Set iConf = Nothing
+    DoEvents
+    
+    On Error GoTo 0
+
+End Sub
+
+'Extract range to xml
+Sub xRange2XML()
+
+    Dim rst             As ADODB.Recordset
+    Dim str             As ADODB.Stream
+    Dim strCon          As String
+    
+    Const strSQL As String = "SELECT * FROM [mailBody]"
+
+    strCon = "Provider=Microsoft.ACE.OLEDB.12.O;" & _
+        "Data Source=" & ThisWorkbook.FullName & ";" & _
+        "Extended Properties=""Excel 12.0;HDR=Yes"";"
+
+    strCon = "Provider=Microsoft.Jet.OLEDB.4.O;" & _
+        "Data Source=" & ThisWorkbook.FullName & ";" & _
+        "Extended Properties=""Excel 12.0;HDR=Yes"";"
+
+    Set rst = New ADODB.Recordset
+    Set str = New ADODB.Stream
+
+    With rst
+        .CursorLocation = adUseClient
+        .Open strSQL, strCon, adOpenStatic, adLockReadOnly, adCmdText
+        .Save str, adPersistXML
+        .Close
+        With str
+            .SaveToFile "c:\xmit\text.xml", adSaveCreateOverWrite
+            .Close
+        End With
+    End With
+
+    Set str = Nothing
+    Set rst = Nothing
+
+End Sub
+Sub PublishHTML()
+
+    Dim wk          As Workbook
+    Dim w           As Worksheet
+    
+    Dim aPath           As String
+    Dim hPath           As String
+    Dim hFile           As String
+    
+    aPath = ActiveWorkbook.path
+    hPath = aPath & "\"
+    hFile = hPath & "SamsBody.htm"
+
+    Call DelFile(hFile)
+    
+    Set wk = ActiveWorkbook
+    'Set w = wk.Worksheets("Hide_HTML_Report")
+    Set w = wk.Worksheets("Hide_HTML_Report")
+    w.Activate
+    w.Select
+        
+'          Sheet:="HTML_2", _
+'          Source:="B5:AB51", _
+
+        
+    With wk.PublishObjects.Add(SourceType:=xlSourceRange, _
+          FileName:=hFile, _
+          Sheet:="Hide_HTML_Report", _
+          Source:=Range("HTML_Extract").Address, _
+          HtmlType:=xlHtmlStatic, _
+          DivID:="Book2_01")
+        .Publish (True)
+        .AutoRepublish = False
+    End With
+    
+    Set w = Worksheets("Hide_Main")
+    w.Activate
+    w.Select
+    
+    Set w = Nothing
+    Set wk = Nothing
+    
+''    If TypeName(application.Caller) = "String" Then
+''        If application.Caller = "btnPublish" Then
+''            MsgBox "File '" & hFile & "' output..."
+''        End If
+''    End If
+
+End Sub
+
+Sub DelFile(ByVal FileName As String)
+
+    On Error GoTo ERR_Mod
+    
+    Kill FileName
+    
+OK_Mod:
+    
+    Exit Sub
+
+ERR_Mod:
+
+    Resume OK_Mod
+
+End Sub
