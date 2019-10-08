@@ -1,0 +1,30 @@
+Sub send()
+Dim NameSpace$, Email As Object, ns$, n%, t
+
+ 
+NameSpace = "http://schemas.microsoft.com/cdo/configuration/"
+
+Set Email = CreateObject("CDO.Message")
+Email.From = "827765356@qq.com" '发件人QQ邮箱
+Email.To = "827765356@qq.com" '要发往的地址
+Email.Subject = "这是标题" '标题
+Email.Textbody = "这是正文" '正文
+'Email.htmlbody = t
+'Email.AddAttachment "D:\test.txt" '添加附件
+With Email.Configuration.Fields
+ .Item(NameSpace & "smtpusessl") = 1
+ .Item(NameSpace & "sendusing") = 2
+ .Item(NameSpace & "smtpserver") = "smtp.qq.com" '发送邮件服务器
+ '.Item(NameSpace & "smtpserverport") = "25"
+' .Item(NameSpace & "smtpauthenticate") = 1
+' .Item(NameSpace & "sendusername") = "827765356@qq.com" '发件人QQ邮箱
+' .Item(NameSpace & "sendpassword") = "zhdkenjkqtmsbbba" '发件人QQ密码
+ .Update
+End With
+Email.send ''发送
+ If Err.Number = 0 Then '处理错误
+MsgBox "发送成功"
+ Else
+MsgBox "发送失败"
+ End If
+End Sub
