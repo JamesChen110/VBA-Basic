@@ -1,0 +1,19 @@
+'Sub dd()
+'
+'
+'    'MsgBox ActiveDocument.Sections.Count
+'    Dim rng As Section
+'    Dim ly As String, ty As String
+'    ly = "2019年"
+'    ty = "2018年"
+'    ActiveDocument.Range.Find.Execute findtext:=ly, replacewith:=ty, Replace:=wdReplaceAll
+'    For Each rng In ActiveDocument.Sections
+'        rng.Footers(wdHeaderFooterFirstPage).Range.Find.Execute findtext:=ly, replacewith:=ty, Replace:=wdReplaceAll
+'        rng.Headers(wdHeaderFooterFirstPage).Range.Find.Execute findtext:=ly, replacewith:=ty, Replace:=wdReplaceAll
+'        rng.Footers(wdHeaderFooterPrimary).Range.Find.Execute findtext:=ly, replacewith:=ty, Replace:=wdReplaceAll
+'        rng.Headers(wdHeaderFooterPrimary).Range.Find.Execute findtext:=ly, replacewith:=ty, Replace:=wdReplaceAll
+'        rng.Footers(wdHeaderFooterEvenPages).Range.Find.Execute findtext:=ly, replacewith:=ty, Replace:=wdReplaceAll
+'        rng.Headers(wdHeaderFooterEvenPages).Range.Find.Execute findtext:=ly, replacewith:=ty, Replace:=wdReplaceAll
+'    Next
+'
+'End Sub
