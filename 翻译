@@ -1,0 +1,55 @@
+Sub main()
+    Dim objxml As Object
+    Dim i As Long, j As Integer
+        Sheets("Sheet1").Select
+        Set objxml = CreateObject("Microsoft.XMLDOM")
+        With Sheet1
+            For i = 1 To 500 '.Cells(Rows.Column, 1).End(xlUp).Row
+                For j = 1 To 100 '.Cells(1, Columns.Count).End(xlToLeft).Column
+                    If Not .Cells(i, j).Value Like "*http*" Then
+                        Sheet2.Cells(i, j).Value = translate(.Cells(i, j))
+                    End If
+                Next
+            
+            Next
+        End With
+       Set objxml = Nothing
+End Sub
+
+Function translate1(ByVal key As Variant, objxml As Object)
+If key.Count > 1 Then
+   translate = "error0"
+   Exit Function
+End If
+'On Error Resume Next
+Dim errcode As Variant
+
+objxml.async = False
+objxml.Load "http://fanyi.youdao.com/openapi.do?keyfrom=yzyx605038&key=1670399482&type=data&doctype=xml&version=1.1&q=" & key
+errcode = objxml.getElementsByTagName("errorCode")(0).ChildNodes(0).NodeValue
+If errcode = "0" Then
+   translate = objxml.getElementsByTagName("paragraph")(0).ChildNodes(0).NodeValue
+Else
+   translate = "error1"
+End If
+
+End Function
+Function translate(ByVal key As Variant)
+If key.Count > 1 Then
+   translate = "error0"
+   Exit Function
+End If
+Dim objxml As Object
+Dim errcode As Variant
+Set objxml = CreateObject("Microsoft.XMLDOM")
+objxml.async = False
+objxml.Load "http://fanyi.youdao.com/openapi.do?keyfrom=yzyx605038&key=1670399482&type=data&doctype=xml&version=1.1&q=" & key
+errcode = objxml.getElementsByTagName("errorCode")(0).ChildNodes(0).NodeValue
+If errcode = "0" Then
+   translate = objxml.getElementsByTagName("paragraph")(0).ChildNodes(0).NodeValue
+Else
+   translate = "error1"
+End If
+Set objxml = Nothing
+End Function
+
