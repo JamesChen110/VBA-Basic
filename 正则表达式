@@ -1,0 +1,13 @@
+Function FunRegExpQ() As String
+    Dim Regx As New RegExp
+    Dim Math As Variant
+    Dim Str As String
+    Str = "2.1x2.2ml" ' "2.2mlX3"
+    With Regx
+        .Global = True
+        .IgnoreCase = True
+        .Pattern = "(\d*\.*?\d*)X[\d\.]+ML|[\d\.]+MLX(\d*\.*?\d*)"
+        Set Math = .Execute(Str)
+        Debug.Print Math(0).SubMatches(0)
+    End With
+End Function
