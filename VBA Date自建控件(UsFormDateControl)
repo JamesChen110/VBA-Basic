@@ -1,0 +1,211 @@
+Option Explicit
+
+Private clsDC As New DateControl
+Private co As New Collection
+Public sLabelName As String
+
+'窗体加载
+Private Sub UserForm_Initialize()
+    With Me
+        .Width = 224
+        .Height = 1000
+    End With
+    AddHead Date
+    AddLabel_Week
+    AddLabel_Day Date
+    Me.Controls("ComboBoxYear").SetFocus
+End Sub
+
+'添加 头部控件
+Private Sub AddHead(ByVal myDate As Date)
+    Dim i As Integer
+    Dim conCommandButton As MSForms.CommandButton
+    Dim conComboBox As MSForms.ComboBox
+    
+    '添加 年列表 左按钮
+    Set conCommandButton = Me.Controls.Add("Forms.CommandButton.1", "Year-")
+    With conCommandButton
+        .Width = 25
+        .Height = 18
+        .Caption = "<<<"
+    End With
+    clsDC.ReceiveCommandButton conCommandButton
+    co.Add clsDC
+    Set clsDC = Nothing
+    
+    '添加 年列表
+    Set conComboBox = Me.Controls.Add("Forms.ComboBox.1", "ComboBoxYear")
+    With conComboBox
+        For i = 1900 To 2999
+            .AddItem i
+        Next
+        .Left = 25
+        .Width = 60
+        .Height = 18
+        .Value = Year(myDate)
+        .Font.Size = 12
+        .ListWidth = 60
+        .ColumnWidths = 18
+        .Style = fmStyleDropDownList
+    End With
+    clsDC.ReceiveComboBox conComboBox
+    co.Add clsDC
+    Set clsDC = Nothing
+    
+    '添加 年列表 右按钮
+    Set conCommandButton = Me.Controls.Add("Forms.CommandButton.1", "Year+")
+    With conCommandButton
+        .Left = 85
+        .Width = 25
+        .Height = 18
+        .Caption = ">>>"
+    End With
+    clsDC.ReceiveCommandButton conCommandButton
+    co.Add clsDC
+    Set clsDC = Nothing
+    
+    '添加 月列表 左按钮
+    Set conCommandButton = Me.Controls.Add("Forms.CommandButton.1", "Month-")
+    With conCommandButton
+        .Left = 120
+        .Width = 25
+        .Height = 18
+        .Caption = "<<<"
+    End With
+    clsDC.ReceiveCommandButton conCommandButton
+    co.Add clsDC
+    Set clsDC = Nothing
+    
+    '添加 月列表
+    Set conComboBox = Me.Controls.Add("Forms.ComboBox.1", "ComboBoxMonth")
+    With conComboBox
+        For i = 1 To 12
+            .AddItem i
+        Next
+        .Left = 145
+        .Width = 40
+        .Height = 18
+        .Value = Month(myDate)
+        .Font.Size = 12
+        .ListWidth = 40
+        .ColumnWidths = 18
+        .Style = fmStyleDropDownList
+    End With
+    clsDC.ReceiveComboBox conComboBox
+    co.Add clsDC
+    Set clsDC = Nothing
+    
+    '添加 月列表 右按钮
+    Set conCommandButton = Me.Controls.Add("Forms.CommandButton.1", "Month+")
+    With conCommandButton
+        .Left = 185
+        .Width = 25
+        .Height = 18
+        .Caption = ">>>"
+    End With
+    clsDC.ReceiveCommandButton conCommandButton
+    co.Add clsDC
+    Set clsDC = Nothing
+End Sub
+
+'添加星期标签
+Private Sub AddLabel_Week()
+    Dim iCol As Integer         '列数
+    Dim vWeek As Variant        '星期几
+    Dim vForeColor As Variant   '前景色(文本颜色)
+    '初始化 星期几 数组
+    vWeek = WeekName
+    '初始化 Label 前景色
+    vForeColor = myColor
+    
+    '添加星期标签
+    For iCol = LBound(vWeek) To UBound(vWeek)
+        With Me.Controls.Add("Forms.Label.1", vWeek(iCol))
+            .Top = 19
+            .Left = iCol * 30
+            .Width = 30
+            .Height = 11
+            .Caption = vWeek(iCol)
+            .ForeColor = vForeColor(iCol)
+            .BorderStyle = fmBorderStyleSingle
+        End With
+    Next
+End Sub
+
+'添加日期标签
+Public Sub AddLabel_Day(ByVal myDate As Date)
+    Dim i As Long               '循环变量
+    Dim iCol As Integer         '列数
+    Dim iRow As Integer         '行数
+    Dim vForeColor As Variant   '前景色(文本颜色)
+    Dim datStartDay As Date     '开始日期
+    Dim datLastDay As Date      '结尾日期
+    Dim conLabel As control
+    
+    'Set co = Nothing
+    
+    '设置窗体的Caption
+    Me.Caption = myDate
+    
+    '删除原有的日期标签
+    For Each conLabel In Controls
+        If conLabel.Name Like "LabelDay*" Then Controls.Remove conLabel.Name
+    Next
+
+    '初始化 Label 前景色
+    vForeColor = myColor
+
+    '取得开始日期
+    datStartDay = DateSerial(Year(myDate), Month(myDate), 1)
+    datStartDay = datStartDay - WeekDay(datStartDay) + 1
+    '取得结尾日期
+    datLastDay = DateSerial(Year(myDate), Month(myDate) + 1, 0)
+    datLastDay = datLastDay + 7 - WeekDay(datLastDay)
+    
+    For i = datStartDay To datLastDay
+        iCol = (i - datStartDay) Mod 7
+        iRow = Int((i - datStartDay) / 7)
+        Set conLabel = Me.Controls.Add("Forms.Label.1", "LabelDay" & i)
+        With conLabel
+            .Top = iRow * 13 + 30
+            .Left = iCol * 30
+            .Width = 30
+            .Height = 13
+            .Caption = Day(i)
+            .Font.Size = 12
+            .Font.Bold = True
+            .TextAlign = fmTextAlignCenter
+            .BorderStyle = fmBorderStyleSingle
+            
+            '设置前景色，如果日期不在本月的，设成灰色
+            If Month(i) = Month(myDate) Then
+                .ForeColor = vForeColor(iCol)
+            Else
+                .ForeColor = RGB(150, 150, 150)
+            End If
+            
+            '设置当前日期标签的背景色
+            If i = myDate Then
+                .BackColor = RGB(0, 100, 250)
+                sLabelName = .Name      '当前日期标签的名称赋给变量备用
+            End If
+        End With
+        clsDC.ReceiveLabel conLabel
+        co.Add clsDC
+        Set clsDC = Nothing
+    Next
+    Me.Height = (iRow + 1) * 13 + 30 + 24 + 8
+End Sub
+
+'初始化 星期几 数组
+Private Function WeekName()
+    WeekName = Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六")
+End Function
+
+'初始化 前景色
+Private Function myColor()
+    myColor = Array(vbRed, 0, 0, 0, 0, 0, vbRed)
+End Function
+
+
+
