@@ -1,0 +1,38 @@
+dim cnn As New ADODB.Connection
+Dim rs As New ADODB.Recordset
+cnn.Open "Provider=Microsoft.Ace.OLEDB.12.0;" & _
+    "Data Source=" & File_Full_Name
+   Set rs = cnn.Execute("Exec NewText " & "1,2")    '& "#"'变量可以在后面追加（多个变量用，隔开），比如1，2
+   '获取表头名称
+   For I = 0 To rs.Fields.Count - 1 
+       .Cells(1, I + 1).Value = rs.Fields(I).Name
+    Next I
+  '获取内容
+  .Cells(2, 1).CopyFromRecordset rs
+  
+  
+'连接Teradata数据库 
+Dim Cnn As Object
+Dim rs As Object
+Set CON = CreateObject("ADODB.Connection")
+Set rs = CreateObject("ADODB.Recordset")
+Dim StrUid As String
+Dim StrPwd As String
+Dim StrVendor As String
+Dim conStr As String
+StrUid = macrosetting.Range("ID")
+StrPwd = macrosetting.Range("password")
+StrVendor = FunStrVendor
+'StrUid = "hdu"
+CON.Open "Driver={Teradata};DBCName=DSN4;Data Source= DSN4 ;Uid=" & StrUid & ";Pwd=" & StrPwd & ";CharSet=UTF8;"
+
+StrSQL = FunStrSql(StrVendor, StartDate, EndDate)
+rs.Open StrSQL, CON, 1, 3
+With Sheet2
+    Call ClearContent(Sheet2, 2)
+    .Range("A2").CopyFromRecordset rs
+    rs.Close
+    CON.Close
+End With
+
+   
