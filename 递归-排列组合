@@ -1,0 +1,23 @@
+Dim sj, jg1(), jg2(), k&, m&, n&, w$
+Sub Combin_dg1() '递归
+
+    m = [a1].End(4).Row - 1 'DgCount '个数
+    sj = [a2].Resize(5)
+    w = "<*>"
+    ReDim jg1(2 ^ m, 1)
+    k = 0
+    Call dgQZH1("", 0, 0)
+    [d2].Resize(UBound(jg1, 1), UBound(jg1, 2)) = jg1
+    
+End Sub
+Sub dgQZH1(r$, j&, t&)
+    Dim i&
+    If InStr(Mid(r, Len(w) + 1), w) > 0 Then
+        k = k + 1
+        jg1(k, 0) = Mid(r, Len(w) + 1)
+    End If
+    If t = m Then Exit Sub
+    For i = j + 1 To m
+        Call dgQZH1(r & w & sj(i, 1), i, t + 1)
+    Next
+End Sub
