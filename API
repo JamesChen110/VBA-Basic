@@ -1,0 +1,25 @@
+#If Win64 Then
+    Public Declare PtrSafe Function GetForegroundWindow Lib "user32" () As Long '获取最顶层对象的句柄
+    Public Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long '获取窗体样式
+    Public Declare PtrSafe Function FindWindow Lib "user32" Alias "FindWindowA" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long '查找句柄
+    Public Declare PtrSafe Function FindWindowEx Lib "user32" Alias "FindWindowExA" (ByVal hWnd1 As Long, ByValhWnd2 As Long, ByVal lpsz1 As String, ByVal lpsz2 As Any) As Long 'API抓窗口函数
+    Public Declare PtrSafe Sub SendMessage Lib "user32" Alias "PostMessageA" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, lParam As Any) '发送操作给对象
+    Public Declare PtrSafe Function PostMessage& Lib "user32" Alias "PostMessageA" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, lParam As Any) '发送操作给对象
+    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long) '休眠
+    Public Const IE_Path = "C:\Program Files (x86)\Internet Explorer\iexplore.exe" 'IE浏览器路径，如果无法调用IE对象，需要先使用Shell打开
+#Else
+    Public Declare Function GetForegroundWindow Lib "user32" () As Long
+    Public Declare Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
+    Public Declare Function FindWindow Lib "user32" Alias "FindWindowA" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+    Public Declare Function FindWindowEx Lib "user32" Alias "FindWindowExA" (ByVal hWnd1 As Long, ByValhWnd2 As Long, ByVal lpsz1 As String, ByVal lpsz2 As Any) As Long  'API抓窗口函数
+    Public Declare Sub SendMessage Lib "user32" Alias "PostMessageA" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, lParam As Any)
+    Public Declare Function PostMessage& Lib "user32" Alias "PostMessageA" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, lParam As Any)
+    Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+    Public Const IE_Path = "C:\Program Files\Internet Explorer\iexplore.exe"
+#End If
+
+    Public Const WM_LBUTTONDOWN = &H201 '左键按下
+    Public Const WM_LBUTTONUP = &H202 '左键抬起
+    Public Const BM_CLICK = &HF5
+    Public Const WM_CLOSE = &H10 '关闭
+    Public Const GWL_STYLE = -16
