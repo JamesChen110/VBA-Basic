@@ -1,0 +1,7 @@
+Sub CopyToClipbox(strText As String)
+    '文本拷贝到剪贴板
+    With CreateObject("new:{1C3B4210-F441-11CE-B9EA-00AA006B1A69}")
+        .SetText strText
+        .PutInClipboard
+    End With
+End Sub
